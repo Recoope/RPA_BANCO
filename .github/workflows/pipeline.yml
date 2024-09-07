@@ -26,15 +26,6 @@ jobs:
           pip install -r requirements.txt
           pip install notebook nbconvert
 
-      - name: Configurar variáveis de ambiente
-        run: |
-            echo "DB_HOST1=${{ secrets.DB_HOST1 }}" >> $GITHUB_ENV
-            echo "DB_DATABASE1=${{ secrets.DB_DATABASE1 }}" >> $GITHUB_ENV
-            echo "DB_USER1=${{ secrets.DB_USER1 }}" >> $GITHUB_ENV
-            echo "DB_PASSWORD1=${{ secrets.DB_PASSWORD1 }}" >> $GITHUB_ENV
-            echo "DB_PORT1=${{ secrets.DB_PORT1 }}" >> $GITHUB_ENV
-            echo "DB_DATABASE2=${{ secrets.DB_DATABASE2 }}" >> $GITHUB_ENV
-
       - name: Run Jupyter Notebook
         run: |
           jupyter nbconvert --to notebook --execute --inplace transformador.ipynb
