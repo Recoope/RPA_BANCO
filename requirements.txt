@@ -1,3 +1,5 @@
 psycopg2>=2.9.0
 pandas>=2.0.0
-dotenv
+psycopg2>=2.9.0
+pandas>=2.0.0
+python-dotenv
