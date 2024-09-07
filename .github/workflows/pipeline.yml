@@ -1,0 +1,54 @@
+name: RPA de banco # nome do teste
+
+# trigger (gatilho)
+on: 
+  push: # o que vai ativar esse gatilho
+    branches: ["main"] # e qual a branch que vai gerar o gatilho (["*"] todas as branches)
+
+# define o que ele vai verificar
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    # passos a serem executados ex:(rodar o requirements, rodar o python, rodar o banco)
+    steps:
+      - uses: actions/checkout@v2 # entra na pasta do meu projeto
+
+      - name: Configurar ambiente para o Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.12.2
+
+      - name: Instalar dependências
+        run: |
+          python -m pip install --upgrade pip
+          pip install coverage
+          pip install -r requirements.txt
+
+      - name: Configurar variáveis de ambiente
+        run: |
+            echo "DB_HOST1=${{ secrets.DB_HOST1 }}" >> $GITHUB_ENV
+            echo "DB_DATABASE1=${{ secrets.DB_DATABASE1 }}" >> $GITHUB_ENV
+            echo "DB_USER1=${{ secrets.DB_USER1 }}" >> $GITHUB_ENV
+            echo "DB_PASSWORD1=${{ secrets.DB_PASSWORD1 }}" >> $GITHUB_ENV
+            echo "DB_PORT1=${{ secrets.DB_PORT1 }}" >> $GITHUB_ENV
+            echo "DB_DATABASE2=${{ secrets.DB_DATABASE2 }}" >> $GITHUB_ENV
+
+      - name: Executar o teste de RPA
+        run: |
+          coverage run -m rpa_banco
+
+      - name: Resultados
+        run: coverage report
+
+      - name: Log in to Docker Hub
+        run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+
+      - name: Verificar login no Docker Hub
+        run: docker info
+
+      - name: Build Docker image
+        run: docker build -t henriquelucareli/rpa_banco:${{ github.run_number }} .
+
+      - name: Push Docker image
+        run: docker push henriquelucareli/rpa_banco:${{ github.run_number }}
