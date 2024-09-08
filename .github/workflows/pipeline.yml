@@ -46,7 +46,7 @@ jobs:
 
       - name: Run Jupyter Notebook
         run: |
-          jupyter nbconvert --to notebook --execute --inplace transformador.ipynb
+          coverage run -m jupyter nbconvert --to notebook --execute --inplace transformador.ipynb
 
       - name: Resultados
         run: coverage report
