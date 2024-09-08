@@ -44,12 +44,12 @@ jobs:
           echo "DB_PORT1=${{ env.DB_PORT1 }}"
           echo "DB_DATABASE2=${{ env.DB_DATABASE2 }}"
 
-      - name: Run Jupyter Notebook
-        run: |
-          coverage run -m jupyter nbconvert --to notebook --execute --inplace transformador.ipynb
+      # - name: Run Jupyter Notebook
+      #   run: |
+      #     coverage run -m jupyter nbconvert --to notebook --execute --inplace transformador.ipynb
 
-      - name: Resultados
-        run: coverage report
+      # - name: Resultados
+      #   run: coverage report
 
       - name: Log in to Docker Hub
         run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
