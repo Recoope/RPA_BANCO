@@ -2,7 +2,7 @@ FROM python
 
 WORKDIR /rpa
 
-COPY transformador.ipynb .
+COPY transformador.py .
 COPY requirements.txt .
 
 RUN pip install -r requirements.txt
