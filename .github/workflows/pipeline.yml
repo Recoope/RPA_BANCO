@@ -61,3 +61,10 @@ jobs:
 
       - name: Push Docker image
         run: docker push henriquelucareli/rpa_banco:${{ github.run_number }}
+
+      - name: Deploy no EC2 -AWS
+        run: |
+          echo "Conectando no EC2"
+          echo "${{secrets.AWS_CHAVE_PIPELINE_AWS_PEM}}" > private_key && chmod 600 private_key
+          ssh -o StrictHostKeyChecking=no -i private_key ubuntu@"${{secrets.chave_ubuntu}}" "
+          cd Aws_pipeline/;git pull;cd python_flask/;./executar.sh"      

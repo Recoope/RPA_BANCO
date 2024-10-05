@@ -25,7 +25,7 @@ print("DB_DATABASE2:", os.getenv('DB_DATABASE2'))
 print('Começando===============================================')
 try:
     # Conectar ao banco de dados
-    conn = psycopg2.connect(
+    conn_1ano = psycopg2.connect(
         host=db_host1,
         database=db_database1,
         user=db_user1,
@@ -38,24 +38,43 @@ except psycopg2.OperationalError as e:
     exit()  # Saia se a conexão falhar
 
 try:
-    cursor = conn.cursor()
+    cursor_1ano = conn_1ano.cursor()
 
-    cursor.execute('''SELECT * FROM Cooperativa''')
-    results = cursor.fetchall()
+    cursor_1ano.execute('''SELECT * FROM Cooperativa''')
+    results = cursor_1ano.fetchall()
     
     # Criar DataFrame
-    columns = [desc[0] for desc in cursor.description]
+    columns = [desc[0] for desc in cursor_1ano.description]
     df = pd.DataFrame(results, columns=columns)
 
-    cursor.execute('''SELECT * FROM Cooperativa''')
-    columns = [desc[0] for desc in cursor.description]
-    results = cursor.fetchall()
+    cursor_1ano.execute('''SELECT * FROM Cooperativa''')
+    columns = [desc[0] for desc in cursor_1ano.description]
+    results = cursor_1ano.fetchall()
     df_cooperativa = pd.DataFrame(results, columns=columns)
+
+    cursor_1ano.execute('''SELECT * FROM Endereco''')
+    columns = [desc[0] for desc in cursor_1ano.description]
+    results = cursor_1ano.fetchall()
+    df_endereco = pd.DataFrame(results, columns=columns)
+
+    cursor_1ano.execute('''SELECT * FROM Leilao''')
+    columns = [desc[0] for desc in cursor_1ano.description]
+    results = cursor_1ano.fetchall()
+    df_leilao = pd.DataFrame(results, columns=columns)
+
+    cursor_1ano.execute('''SELECT * FROM Produto''')
+    columns = [desc[0] for desc in cursor_1ano.description]
+    results = cursor_1ano.fetchall()
+    df_produto = pd.DataFrame(results, columns=columns)
+
+    cursor_1ano.execute('''SELECT * FROM Imagens''')
+    columns = [desc[0] for desc in cursor_1ano.description]
+    results = cursor_1ano.fetchall()
+    df_foto = pd.DataFrame(results, columns=columns)
     
-finally:
-    # Fechar o cursor e a conexão
-    cursor.close()
-    conn.close()
+except psycopg2.OperationalError as e:
+    print(f"Erro ao conectar ao banco de dados: {e}")
+    exit()  # Saia se a conexão falhar
 
 # BANCO DO SEGUNDO ANO ========================================
 
@@ -77,22 +96,224 @@ except psycopg2.OperationalError as e:
 
 try:
     cursor = conn.cursor()
-
-    cursor.execute('DELETE FROM cooperativa') # deleta todos os registros para garantir que não vai pegar dados duplicados e garante que todos os valores do banco apagados ou alterados seram registrados
-                   
+    cursor_1ano = conn_1ano.cursor()
+                        
     for i in range(len(df_cooperativa)):
-        cursor.execute('CALL insert_cooperativa(%s, %s, %s, %s)', 
-                       (df_cooperativa['cnpj'][i], df_cooperativa['nome'][i], df_cooperativa['email'][i], df_cooperativa['senha'][i]))
+        if df_cooperativa['dados_status'][i] == True:
+            try:
+                # Tenta inserir no banco de dados
+                cursor.execute('CALL insert_cooperativa(%s, %s, %s, %s, %s)', 
+                    (df_cooperativa['cnpj'][i], df_cooperativa['nome'][i], df_cooperativa['email'][i], df_cooperativa['senha'][i], 
+                    df_cooperativa['status'][i]))
+            
+            except Exception as e:
+                print(f'Erro: {e}')
+                print(f"Fazendo Update!!!===========================")
+                conn.rollback()
 
-    # Confirme as alterações
+                try:
+                    # Tenta fazer o update
+                    cursor.execute('UPDATE cooperativa SET nome_cooperativa=%s, email_cooperativa=%s, senha_cooperativa=%s where cnpj_cooperativa=%s',
+                               (df_cooperativa['nome'][i], df_cooperativa['email'][i], df_cooperativa['senha'][i], df_cooperativa['cnpj'][i]))
+
+                    # Confirma o update
+                    conn.commit()
+
+                except Exception as e_update:
+                    conn.rollback()
+                    print(f"Erro no update: {e_update}")
+
     conn.commit()
     print("Deu Green")
+
 except Exception as e:
-    print(f"Erro ao executar a procedure: {e}")
     conn.rollback()
+    print(f"Erro ao executar: {e}")
+
 finally:
+    try:
+        for i in range(len(df_cooperativa)):
+            cursor_1ano.execute('UPDATE cooperativa SET dados_status=%s where cnpj=%s',
+                                (False, df_cooperativa['cnpj'][i]))
+
+        conn_1ano.commit()
+    except Exception as e:
+        print(f"Erro no finally ao tentar atualizar status: {e}")
+
+try:
+    cursor = conn.cursor()
+    cursor_1ano = conn_1ano.cursor()
+
+    for i in range(len(df_leilao)):
+        if df_leilao['dados_status'][i] == True:  # Corrige o acesso à linha específica com [i]
+            try:
+                # Tenta inserir no banco de dados
+                cursor.execute('CALL insert_leilao(%s, %s, %s, %s, %s, %s, %s)', 
+                    (int(df_leilao['id_endereco'][i]), df_leilao['id_cooperativa'][i], df_leilao['data_inicio'][i], 
+                     df_leilao['data_fim'][i], int(df_leilao['id'][i]), df_leilao['hora'][i], df_leilao['status'][i]))
+
+                print('passei aqui')
+            except Exception as e:
+                print(f'Erro: {e}')
+                print(f"Update feito==============")
+                conn.rollback()
+
+                try:
+                    cursor.execute('UPDATE leilao SET data_inicio_leilao=%s, data_fim_leilao=%s, hora_leilao=%s, id_endereco=%s WHERE cnpj_cooperativa=%s', 
+                    (df_leilao['data_inicio'][i], df_leilao['data_fim'][i], df_leilao['hora'][i], 
+                     int(df_leilao['id_endereco'][i]), df_leilao['id_cooperativa'][i]))
+
+                    conn_1ano.commit()
+                except Exception as e:
+                    print(f"Erro no finally ao tentar atualizar status: {e}")
+                    conn.rollback()
+
+    # Confirma as alterações
+    conn.commit()
+    print("Deu Green")
+
+except Exception as e:
+    # Faz rollback em caso de erro
+    conn.rollback()
+    print(f"Erro ao executar: {e}")
+
+finally:
+    try:
+        for i in range(len(df_leilao)):
+            cursor_1ano.execute('UPDATE leilao SET dados_status=%s WHERE id=%s', 
+                                (False, int(df_leilao['id'][i])))
+
+        conn_1ano.commit()
+    except Exception as e:
+        print(f"Erro no finally ao tentar atualizar status: {e}")
+
+try:
+    cursor = conn.cursor()
+    cursor_1ano = conn_1ano.cursor()
+
+    for i in range(len(df_produto)):
+        if df_produto['dados_status'][i] == True:
+            try:
+                # Tenta inserir no banco de dados
+                cursor.execute('''CALL insert_produto (%s, %s, %s, %s, %s, %s, %s)''', 
+                    (int(df_produto['id'][i]), df_produto['material'][i], float(df_leilao['valor_inicial'][i]), 
+                     float(df_produto['peso'][i]), df_foto['imagem'][i], int(df_produto['id_leilao'][i]), 
+                     df_produto['status'][i]))
+                
+                # Confirma a inserção
+                conn.commit()
+
+            except Exception as e:
+                # Faz rollback após erro no insert
+                conn.rollback()
+                print(f"Erro no insert: {e}")
+                print("Fazendo Update================")
+                
+                try:
+                    # Tenta fazer o update
+                    cursor.execute('''UPDATE produto SET tipo_produto=%s, valor_inicial_produto=%s, peso_produto=%s, 
+                                      foto_produto=%s, id_leilao=%s WHERE id_produto=%s''',
+                                   (df_produto['material'][i], float(df_leilao['valor_inicial'][i]), 
+                                    float(df_produto['peso'][i]), df_foto['imagem'][i], 
+                                    int(df_produto['id_leilao'][i]), int(df_produto['id'][i])))
+
+                    # Confirma o update
+                    conn.commit()
+
+                except Exception as e_update:
+                    conn.rollback()
+                    print(f"Erro no update: {e_update}")
+
+    print("Deu Green")
+
+except Exception as e:
+    # Faz rollback se ocorrer erro geral
+    conn.rollback()
+    print(f"Erro ao executar: {e}")
+
+finally:
+    try:
+        # Atualiza o campo dados_status na outra tabela
+        for i in range(len(df_produto)):
+            cursor_1ano.execute('UPDATE produto SET dados_status=%s WHERE id=%s',
+                                (False, int(df_produto['id'][i])))
+
+        conn_1ano.commit()
+    except Exception as e:
+        print(f"Erro no finally ao tentar atualizar status: {e}")
+
+    finally:
+        # Fecha os cursores e conexões
+        cursor.close()
+        conn.close()
+        cursor_1ano.close()
+        conn_1ano.close()
+
+try:
+    cursor = conn.cursor()
+    cursor_1ano = conn_1ano.cursor()
+
+    for i in range(len(df_endereco)):
+        if df_endereco['dados_status'][i] == True:  # Corrige a verificação do status
+            id_endereco = int(df_endereco['id'][i])
+            cidade = str(df_endereco['cidade'][i])
+            logradouro = str(df_endereco['logradouro'][i])
+            numero = int(df_endereco['numero'][i])
+            status = str(df_endereco['status'][i])
+
+            try:
+                # Tenta inserir no banco de dados
+                cursor.execute('CALL insert_endereco(%s::int, %s::varchar, %s::varchar, %s::int, %s::varchar)', 
+                    (id_endereco, cidade, logradouro, numero, status))
+
+            except Exception as e:
+                # Caso o insert falhe, tenta fazer o update
+                print(f"Falha ao inserir, tentando atualizar: {e}")
+                conn.rollback()
+                print('Update sendo feito============')
+                try:
+                    # Tenta fazer o update
+                    cursor.execute('UPDATE endereco SET cidade=%s, rua=%s, numero=%s WHERE id_endereco=%s',
+                    (cidade, logradouro, numero, id_endereco))  
+                    
+                    # Confirma o update
+                    conn.commit()
+
+                except Exception as e_update:
+                    conn.rollback()
+                    print(f"Erro no update: {e_update}")
+                            
+
+    # Confirma as alterações
+    conn.commit()
+    print("Deu Green")
+
+except Exception as e:
+    # Faz rollback em caso de erro
+    conn.rollback()
+    print(f"Erro ao executar: {e}")
+
+finally:
+    try:
+        # Atualiza o campo dados_status na outra tabela
+        for i in range(len(df_endereco)):
+            id_endereco = int(df_endereco['id'][i])
+            # Atualiza o status se a inserção for bem-sucedida
+            cursor_1ano.execute('UPDATE endereco SET dados_status=%s WHERE id=%s', 
+                            (False, id_endereco))
+
+        conn_1ano.commit()
+    except Exception as e:
+        print(f"Erro no finally ao tentar atualizar status: {e}")
+    # Fechar o cursor e a conexão
     cursor.close()
     conn.close()
+    cursor_1ano.close()
+    conn_1ano.close()
 
+
+# Só para garantir. Não custa nada
 cursor.close()
 conn.close()
+cursor_1ano.close()
+conn_1ano.close()
