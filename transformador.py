@@ -310,10 +310,3 @@ finally:
     conn.close()
     cursor_1ano.close()
     conn_1ano.close()
-
-
-# Só para garantir. Não custa nada
-cursor.close()
-conn.close()
-cursor_1ano.close()
-conn_1ano.close()
