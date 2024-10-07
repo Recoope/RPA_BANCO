@@ -242,13 +242,6 @@ finally:
     except Exception as e:
         print(f"Erro no finally ao tentar atualizar status: {e}")
 
-    finally:
-        # Fecha os cursores e conexões
-        cursor.close()
-        conn.close()
-        cursor_1ano.close()
-        conn_1ano.close()
-
 try:
     cursor = conn.cursor()
     cursor_1ano = conn_1ano.cursor()
