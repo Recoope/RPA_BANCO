@@ -1,0 +1,40 @@
+Aws RPA
+-- Preparando os Softwares -------------------------------------------------
+
+sudo apt-get update
+sudo apt-get upgrade
+sudo apt-get install -y python3
+sudo apt-get install -y python3-pip
+sudo apt-get install git
+
+-- Carregar o projeto -----------------------------------------------------
+
+git clone https://github.com/Recoope/RPA_BANCO.git
+
+cd RPA_BANCO/
+
+-- Ativar .ENV ------------------------------------------------------------
+
+sudo apt-get install python3.12-venv
+python3 -m venv my_env
+source my_env/bin/activate
+
+pip3 install -r requirements.txt
+-- Alterar permissÃ£o de execuÃ§Ã£o do shell -------------------------------
+
+cd python_flask/
+chmod 777 executar.sh
+chmod 777 iniciarApp.sh
+
+
+-- Configurar CRONTAB --------------------------------------------------
+
+crontab -e
+*/1 * * * * /home/ubuntu/RPA_BANCO/python_flask/executar.sh >>/home/ubuntu/RPA_BANCO/log.txt
+
+
+-- LOGs Crontab ---------------------------------------------------------
+
+tail -n 5 /var/log/syslog
+ou
+cat /var/mail/ubuntu

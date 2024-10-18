@@ -9,4 +9,4 @@ else
 fi
 
 tmux send-keys -t 0 C-c
-tmux send-keys -t 0 "./iniciarApp.sh" C-m
+tmux send-keys -t 0 "/home/ubuntu/RPA_BANCO/python_flask/iniciarApp.sh" C-m
