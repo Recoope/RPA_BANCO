@@ -32,7 +32,7 @@ chmod 777 iniciarApp.sh
 -- Configurar CRONTAB --------------------------------------------------
 
 crontab -e
-*/1 * * * * /home/ubuntu/RPA_BANCO/python_flask/executar.sh
+*/1 * * * * /home/ubuntu/RPA_BANCO/python_flask/iniciarApp.sh
 
 
 -- LOGs Crontab ---------------------------------------------------------
