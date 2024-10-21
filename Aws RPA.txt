@@ -6,6 +6,7 @@ sudo apt-get upgrade
 sudo apt-get install -y python3
 sudo apt-get install -y python3-pip
 sudo apt-get install git
+sudo apt install postfix mailutils
 
 -- Carregar o projeto -----------------------------------------------------
 
@@ -20,19 +21,18 @@ python3 -m venv my_env
 source my_env/bin/activate
 
 pip3 install -r requirements.txt
-pip install psycopg2-binary
+pip install psycopg[binary]
 
 -- Alterar permissÃ£o de execuÃ§Ã£o do shell -------------------------------
 
 cd python_flask/
-chmod 777 executar.sh
 chmod 777 iniciarApp.sh
 
 
 -- Configurar CRONTAB --------------------------------------------------
 
 crontab -e
-*/1 * * * * /home/ubuntu/RPA_BANCO/python_flask/executar.sh >>/home/ubuntu/RPA_BANCO/log.txt
+*/1 * * * * /home/ubuntu/RPA_BANCO/python_flask/executar.sh
 
 
 -- LOGs Crontab ---------------------------------------------------------
@@ -40,3 +40,9 @@ crontab -e
 tail -n 5 /var/log/syslog
 ou
 cat /var/mail/ubuntu
+
+-- Verifica se foi
+tmux ls
+
+-- Mata se eu não quiser que funciona
+tmux kill-session -t app
