@@ -55,4 +55,4 @@ jobs:
           echo "Conectando no EC2"
           echo "${{secrets.AWS_CHAVE_PIPELINE_AWS_PEM}}" > private_key && chmod 600 private_key
           ssh -o StrictHostKeyChecking=no -i private_key ubuntu@"${{secrets.chave_ubuntu}}" "
-          cd Aws_pipeline/;git pull;cd python_flask/;./iniciarApp.sh"      
+          cd RPA_BANCO/;git pull;cd python_flask/;./iniciarApp.sh"      
