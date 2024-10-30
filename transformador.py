@@ -7,8 +7,14 @@ import os
 print('Começando===============================================')
 try:
     # Conectar ao banco de dados
+    # postgres://avnadmin:AVNS_DAFAJWqxMl1ba9hBbcZ@recoop-germinare-9764.h.aivencloud.com:16983/BANCO_1ANO?sslmode=require
     conn_1ano = psycopg.connect("postgres://avnadmin:AVNS_DAFAJWqxMl1ba9hBbcZ@recoop-germinare-9764.h.aivencloud.com:16983/BANCO_1ANO?sslmode=require")
-    print("Conexão estabelecida com sucesso!")
+    # conn_1ano = psycopg.connect( host="ec2-3-209-22-165.compute-1.amazonaws.com",
+    #                             port="5432",
+    #                             dbname="BANCO_1ANO",
+    #                            user="recoope_user",
+    #                             password="Recooper@2024")
+    # print("Conexão estabelecida com sucesso!")
 
 except psycopg.OperationalError as e:
     print(f"Erro ao conectar ao banco de dados: {e}")
@@ -58,7 +64,12 @@ except psycopg.OperationalError as e:
 print('Começando===============================================')
 try:
     # Conectar ao banco de dados
-    conn = psycopg.connect("postgres://avnadmin:AVNS_DAFAJWqxMl1ba9hBbcZ@recoop-germinare-9764.h.aivencloud.com:16983/defaultdb?sslmode=require")
+    conn = psycopg.connect("postgres://avnadmin:AVNS_DAFAJWqxMl1ba9hBbcZ@recoop-germinare-9764.h.aivencloud.com:16983/BANCO_1ANO?sslmode=require")
+    # conn = psycopg.connect(host="ec2-3-209-22-165.compute-1.amazonaws.com",
+    #                         port="5432",
+    #                         dbname="BANCO_1ANO",
+    #                         user="recoope_user",
+    #                         password="Recooper@2024")
 
     print("Conexão estabelecida com sucesso!")
 except psycopg.OperationalError as e:
