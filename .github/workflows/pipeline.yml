@@ -48,11 +48,4 @@ jobs:
           coverage run transformador.py
 
       - name: Resultados
-        run: coverage report
-
-      - name: Deploy no EC2 -AWS
-        run: |
-          echo "Conectando no EC2"
-          echo "${{secrets.AWS_CHAVE_PIPELINE_AWS_PEM}}" > private_key && chmod 600 private_key
-          ssh -o StrictHostKeyChecking=no -i private_key ubuntu@"${{secrets.chave_ubuntu}}" "
-          cd /home/ubuntu/RecoopeCompose/RPA_BANCO/;git pull;cd python_flask/;./iniciarApp.sh"      
+        run: coverage report    
