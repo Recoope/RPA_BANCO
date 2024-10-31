@@ -53,7 +53,7 @@ jobs:
         run: coverage report
 
       - name: Deploy no EC2 -AWS
-        if: ${{ github.event.pull_request.merged }}
+        if: github.event_name == 'push'
         run: |
             echo "Conectando no EC2"
             echo "${{secrets.AWS_CHAVE_PIPELINE_AWS_PEM}}" > private_key && chmod 600 private_key
