@@ -1,6 +1,9 @@
 import psycopg
 import pandas as pd
 import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 db_host = os.getenv('DB_HOST1')
 db_database1 = os.getenv('DB_DATABASE1')
