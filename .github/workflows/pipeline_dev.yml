@@ -2,8 +2,8 @@ name: RPA de banco # nome do teste
 
 # trigger (gatilho)
 on: 
-  pull_request: # o que vai ativar esse gatilho
-    branches: ["main"] # e qual a branch que vai gerar o gatilho (["*"] todas as branches)
+  push: # o que vai ativar esse gatilho
+    branches: ["dev"] # e qual a branch que vai gerar o gatilho (["*"] todas as branches)
 
 # define o que ele vai verificar
 jobs:
@@ -49,10 +49,3 @@ jobs:
 
       - name: Resultados
         run: coverage report
-
-      - name: Deploy no EC2 -AWS
-        run: |
-          echo "Conectando no EC2"
-          echo "${{secrets.AWS_CHAVE_PIPELINE_AWS_PEM}}" > private_key && chmod 600 private_key
-          ssh -o StrictHostKeyChecking=no -i private_key ubuntu@"${{secrets.chave_ubuntu}}" "
-          cd RPA_BANCO/;git pull;cd python_flask/;./iniciarApp.sh"      

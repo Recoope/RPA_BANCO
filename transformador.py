@@ -2,19 +2,25 @@ import psycopg
 import pandas as pd
 import os
 
+db_host = os.getenv('DB_HOST1')
+db_database1 = os.getenv('DB_DATABASE1')
+db_user = os.getenv('DB_USER1')
+db_password = os.getenv('DB_PASSWORD1')
+db_port = os.getenv('DB_PORT1')
+
+db_database2 = os.getenv('DB_DATABASE2')
+
 # BANCO DO PRIMEIRO ANO========================================
 
 print('Começando===============================================')
 try:
     # Conectar ao banco de dados
-    # postgres://avnadmin:AVNS_DAFAJWqxMl1ba9hBbcZ@recoop-germinare-9764.h.aivencloud.com:16983/BANCO_1ANO?sslmode=require
-    conn_1ano = psycopg.connect("postgres://avnadmin:AVNS_DAFAJWqxMl1ba9hBbcZ@recoop-germinare-9764.h.aivencloud.com:16983/BANCO_1ANO?sslmode=require")
-    # conn_1ano = psycopg.connect( host="ec2-3-209-22-165.compute-1.amazonaws.com",
-    #                             port="5432",
-    #                             dbname="BANCO_1ANO",
-    #                            user="recoope_user",
-    #                             password="Recooper@2024")
-    # print("Conexão estabelecida com sucesso!")
+    conn_1ano = psycopg.connect(host=db_host,
+                                port=db_port,
+                                dbname=db_database1,
+                               user=db_user,
+                                password=db_password)
+    print("Conexão estabelecida com sucesso!")
 
 except psycopg.OperationalError as e:
     print(f"Erro ao conectar ao banco de dados: {e}")
@@ -64,12 +70,11 @@ except psycopg.OperationalError as e:
 print('Começando===============================================')
 try:
     # Conectar ao banco de dados
-    conn = psycopg.connect("postgres://avnadmin:AVNS_DAFAJWqxMl1ba9hBbcZ@recoop-germinare-9764.h.aivencloud.com:16983/BANCO_1ANO?sslmode=require")
-    # conn = psycopg.connect(host="ec2-3-209-22-165.compute-1.amazonaws.com",
-    #                         port="5432",
-    #                         dbname="BANCO_1ANO",
-    #                         user="recoope_user",
-    #                         password="Recooper@2024")
+    conn = psycopg.connect(host=db_host,
+                                port=db_port,
+                                dbname=db_database2,
+                               user=db_user,
+                                password=db_password)
 
     print("Conexão estabelecida com sucesso!")
 except psycopg.OperationalError as e:
