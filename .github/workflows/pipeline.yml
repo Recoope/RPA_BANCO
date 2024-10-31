@@ -51,12 +51,13 @@ jobs:
         run: coverage report
 
       - name: Deploy no EC2 -AWS
+        if: ${{ github.event.pull_request.merged }}
         run: |
-          echo "Conectando no EC2"
-          echo "${{secrets.AWS_CHAVE_PIPELINE_AWS_PEM}}" > private_key && chmod 600 private_key
-          ssh -o StrictHostKeyChecking=no -i private_key ubuntu@"${{secrets.chave_ubuntu}}" "
-          cd /home/ubuntu/RecoopeCompose/RPA_BANCO
-          git pull origin main
-          cd ..
-          bash ./deploy.sh"
-      
+            echo "Conectando no EC2"
+            echo "${{secrets.AWS_CHAVE_PIPELINE_AWS_PEM}}" > private_key && chmod 600 private_key
+            ssh -o StrictHostKeyChecking=no -i private_key ubuntu@"${{secrets.chave_ubuntu}}" "
+            cd /home/ubuntu/RecoopeCompose/RPA_BANCO
+            git pull origin main
+            cd ..
+            bash ./deploy.sh"
+        
