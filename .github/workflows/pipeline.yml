@@ -2,6 +2,8 @@ name: RPA de banco # nome do teste
 
 # trigger (gatilho)
 on: 
+  push:
+    branches: ["main"] # e qual a branch que vai gerar o gatilho (["*"] todas as branches)
   pull_request: # o que vai ativar esse gatilho
     branches: ["main"] # e qual a branch que vai gerar o gatilho (["*"] todas as branches)
 
